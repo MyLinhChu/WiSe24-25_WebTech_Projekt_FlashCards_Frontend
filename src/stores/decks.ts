@@ -1,13 +1,15 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { Deck, FlashCard } from '@/types'
+import { defineStore } from 'pinia' // Funktion zur Definition eines Stores
+import { ref, computed } from 'vue' // Reaktive Variablen und Computed Properties
+import type { Deck, FlashCard } from '@/types' // Typdefinitionen für Decks und Karten
 
+// Pinia-Store für Deck-Daten
 export const useDeckStore = defineStore('deck', () => {
-  const decks = ref<Deck[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  // State: Liste der Decks, Ladeanzeige, Fehler
+  const decks = ref<Deck[]>([]) // Liste der vorhandenen Decks
+  const loading = ref(false) // Ladeanzeige
+  const error = ref<string | null>(null) // Fehlermeldung (falls vorhanden)
 
-  // Mock data for development
+  // Mock data für die Entwicklung (werden in der fetch-Methode verwendet)
   const mockDecks: Deck[] = [
     {
       id: 1,
@@ -35,30 +37,33 @@ export const useDeckStore = defineStore('deck', () => {
     }
   ]
 
+  // Methode: Decks laden
   const fetchDecks = async () => {
-    loading.value = true
-    error.value = null
+    loading.value = true  // Ladeanzeige aktivieren
+    error.value = null // Fehler zurücksetzen
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulierter API-Aufruf
       if (decks.value.length === 0) {
-        decks.value = mockDecks
+        decks.value = mockDecks  // Mock-Daten verwenden
       }
     } catch (err) {
-      error.value = 'Failed to fetch decks'
+      error.value = 'Failed to fetch decks' // Fehler setzen
       console.error(err)
     } finally {
-      loading.value = false
+      loading.value = false // Ladeanzeige deaktivieren
     }
   }
 
+  // Methode: Ein bestimmtes Deck anhand der ID abrufen
   const getDeck = computed(() => (id: number) => {
     return decks.value.find(deck => deck.id === id)
   })
 
+  // Methode: Neues Deck erstellen
   const createDeck = async (name: string, description: string = '', initialCards: FlashCard[] = []) => {
     const newDeck: Deck = {
-      id: Math.max(0, ...decks.value.map(d => d.id)) + 1,
+      id: Math.max(0, ...decks.value.map(d => d.id)) + 1, // ID basierend auf vorhandenen Decks
       name,
       description,
       cards: initialCards,
@@ -66,28 +71,31 @@ export const useDeckStore = defineStore('deck', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-    decks.value.push(newDeck)
+    decks.value.push(newDeck) // Neues Deck zur Liste hinzufügen
     return newDeck
   }
 
+  // Methode: Bestehendes Deck aktualisieren
   const updateDeck = async (id: number, updates: Partial<Deck>) => {
-    const index = decks.value.findIndex(deck => deck.id === id)
+    const index = decks.value.findIndex(deck => deck.id === id)  // Deck finden
     if (index !== -1) {
       decks.value[index] = {
-        ...decks.value[index],
-        ...updates,
+        ...decks.value[index], // Bestehendes Deck
+        ...updates, // Änderungen anwenden
         updatedAt: new Date().toISOString()
       }
     }
   }
 
+  // Methode: Deck löschen
   const deleteDeck = async (id: number) => {
-    const index = decks.value.findIndex(deck => deck.id === id)
+    const index = decks.value.findIndex(deck => deck.id === id) // Deck finden
     if (index !== -1) {
-      decks.value.splice(index, 1)
+      decks.value.splice(index, 1) // Deck aus der Liste entfernen
     }
   }
 
+  // Exportiert State und Methoden für den Store
   return {
     decks,
     loading,

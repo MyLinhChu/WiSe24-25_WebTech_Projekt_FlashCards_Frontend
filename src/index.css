@@ -1,3 +1,9 @@
+/* Importiert die Basisstile von Tailwind CSS. Diese enthalten globale Stile wie Schriftarten,
+   Standard-Margin/Padding und grundlegende HTML-Element-Stile (z. B. <h1>, <p>). */
 @tailwind base;
+/* Importiert die Komponentenstile von Tailwind CSS. Diese Stile definieren visuelle Komponenten
+   wie Buttons, Karten und Formularelemente. */
 @tailwind components;
+/* Importiert die Dienstprogrammschichten von Tailwind CSS. Diese bieten Klassen für Margin,
+   Padding, Farben, Schriftarten, Layouts und andere Utilities. */
 @tailwind utilities;
