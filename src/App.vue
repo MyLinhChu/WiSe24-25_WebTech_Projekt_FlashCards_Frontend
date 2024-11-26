@@ -10,17 +10,7 @@
               <!-- Icon für die App -->
               <BookOpenIcon class="h-8 w-8 text-blue-500" />
               <!-- App-Name -->
-              <span class="ml-2 text-xl font-bold">FlashCards</span>
-            </router-link>
-          </div>
-          <!-- Link zum Erstellen eines neuen Decks -->
-          <div class="flex items-center">
-            <!-- Link zum Erstellen eines neuen Decks -->
-            <router-link
-              to="/create"
-              class="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Create Deck
+              <span class="ml-2 text-xl font-bold">RecallHub</span>
             </router-link>
           </div>
         </div>
