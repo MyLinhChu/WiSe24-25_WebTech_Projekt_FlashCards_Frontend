@@ -1,15 +1,19 @@
 <template>
   <div class="max-w-2xl mx-auto space-y-6 p-6">
     <div class="flex justify-between items-center">
+      <!-- Titel -->
       <h1 class="text-3xl font-bold text-gray-900">{{ isEditing ? 'Edit Deck' : 'Create New Deck' }}</h1>
+      <!-- Zurück-Link -->
       <router-link to="/" class="text-gray-600 hover:text-gray-900 flex items-center">
         <ArrowLeftIcon class="w-5 h-5 mr-2" />
         Back to Home
       </router-link>
     </div>
 
+    <!-- Formular für Deck-Daten -->
     <div class="bg-white shadow rounded-lg p-6">
       <form @submit.prevent="saveDeck" class="space-y-6">
+        <!-- Deck Name -->
         <div>
           <label for="deckName" class="block text-sm font-medium text-gray-700">Deck Name</label>
           <input
@@ -21,9 +25,23 @@
           />
         </div>
 
+        <!-- Deck Beschreibung -->
+        <div>
+          <label for="deckDescription" class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            id="deckDescription"
+            v-model="description"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            rows="3"
+            placeholder="A short description of the deck..."
+          ></textarea>
+        </div>
+
+        <!-- Karten bearbeiten -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Cards</label>
           <div class="space-y-4">
+            <!-- Iteration über die Karten -->
             <div v-for="(card, index) in cards" :key="card.id" class="flex gap-4">
               <div class="flex-1">
                 <input
@@ -41,6 +59,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
+              <!-- Karte entfernen -->
               <button
                 type="button"
                 @click="removeCard(index)"
@@ -51,6 +70,7 @@
             </div>
           </div>
 
+          <!-- Neue Karte hinzufügen -->
           <button
             type="button"
             @click="addCard"
@@ -61,6 +81,7 @@
           </button>
         </div>
 
+        <!-- Aktionen: Speichern oder Löschen -->
         <div class="flex justify-end gap-4">
           <button
             v-if="isEditing"
@@ -97,6 +118,7 @@ const deckId = computed(() => route.params.id ? parseInt(route.params.id as stri
 const isEditing = computed(() => !!deckId.value)
 
 const deckName = ref('')
+const description = ref('') // Neue reaktive Variable für die Beschreibung
 const cards = ref<FlashCard[]>([])
 
 const addCard = () => {
@@ -115,10 +137,11 @@ const saveDeck = async () => {
   if (isEditing.value && deckId.value) {
     await deckStore.updateDeck(deckId.value, {
       name: deckName.value,
+      description: description.value, // Beschreibung in den Updates mitschicken
       cards: cards.value
     })
   } else {
-    await deckStore.createDeck(deckName.value, '', cards.value)
+    await deckStore.createDeck(deckName.value, description.value, cards.value) // Beschreibung beim Erstellen mitgeben
   }
   router.push('/')
 }
@@ -133,10 +156,11 @@ const deleteCurrentDeck = async () => {
 }
 
 onMounted(() => {
-  if (isEditing.value) {
-    const deck = deckStore.getDeck(deckId.value!)
+  if (isEditing.value && deckId.value) {
+    const deck = deckStore.getDeck(deckId.value)
     if (deck) {
       deckName.value = deck.name
+      description.value = deck.description // Bestehende Beschreibung in das Feld laden
       cards.value = [...deck.cards]
     }
   } else {
@@ -144,3 +168,4 @@ onMounted(() => {
   }
 })
 </script>
+
