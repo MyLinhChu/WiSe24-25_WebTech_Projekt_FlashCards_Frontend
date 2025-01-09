@@ -1,6 +1,6 @@
 // FlashCard: Struktur für einzelne Karten, die Frage-Antwort-Paare repräsentieren
 export interface FlashCard {
-  id: number // Eindeutige ID der Karte
+  id?: number // Eindeutige ID der Karte
   frage: string
   antwort: string
   lastReviewed?: string // Optional: Letztes Überprüfungsdatum (als ISO-Zeitstring gespeichert)

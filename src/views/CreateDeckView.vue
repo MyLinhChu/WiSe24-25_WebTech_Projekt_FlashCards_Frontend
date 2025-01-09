@@ -123,7 +123,6 @@ const cards = ref<FlashCard[]>([])
 
 const addCard = () => {
   cards.value.push({
-    id: Date.now(),
     frage: '',
     antwort: ''
   })
