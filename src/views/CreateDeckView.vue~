@@ -133,26 +133,17 @@ const removeCard = (index: number) => {
 }
 
 const saveDeck = async () => {
-  const payload = {
-    name: deckName.value,
-    description: description.value,
-    cards: cards.value.map(card => ({
-      frage: card.frage,
-      antwort: card.antwort,
-    })),
-  };
-
   if (isEditing.value && deckId.value) {
-    await deckStore.updateDeck(deckId.value, payload);
+    await deckStore.updateDeck(deckId.value, {
+      name: deckName.value,
+      description: description.value, // Beschreibung in den Updates mitschicken
+      cards: cards.value
+    })
   } else {
-    const newDeck = await deckStore.createDeck(payload.name, payload.description, payload.cards);
-    if (newDeck) {
-      deckStore.decks.push(newDeck); // Push the new deck to the store
-    }
+    await deckStore.createDeck(deckName.value, description.value, cards.value) // Beschreibung beim Erstellen mitgeben
   }
-  router.push('/');
-};
-
+  router.push('/')
+}
 
 const deleteCurrentDeck = async () => {
   if (confirm('Are you sure you want to delete this deck?')) {

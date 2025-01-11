@@ -53,32 +53,17 @@ import { defineStore } from 'pinia'
    // Deck aktualisieren
    const updateDeck = async (id: number, updates: Partial<Deck>) => {
      try {
-       const payload = {
-         name: updates.name,
-         description: updates.description,
-         cards: updates.cards?.map(card => ({
-           frage: card.frage,
-           antwort: card.antwort
-         })) || []
-       };
-
-       const response = await axios.put<Deck>(`${apiEndpoint}/${id}`, payload, {
-         headers: {
-           'Content-Type': 'application/json',
-         },
-       });
-
-       const updatedDeck = response.data;
-       const index = decks.value.findIndex(deck => deck.id === id);
+       const response = await axios.put<Deck>(`${apiEndpoint}/${id}`, updates)
+       const updatedDeck = response.data
+   const index = decks.value.findIndex(deck => deck.id === id)
        if (index !== -1) {
-         decks.value[index] = updatedDeck;
+         decks.value[index] = updatedDeck
        }
      } catch (err) {
-       error.value = 'Failed to update deck';
-       console.error(err);
+       error.value = 'Failed to update deck'
+       console.error(err)
      }
-   };
-
+   }
 
    // Deck löschen
    const deleteDeck = async (id: number) => {
