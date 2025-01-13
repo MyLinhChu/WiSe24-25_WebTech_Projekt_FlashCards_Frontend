@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import DeckList from '@/views/HomeView.vue';
+import DeckList from '../../components/DeckList.vue';
 
 describe('DeckList.vue', () => {
   it('calls deleteDeck when delete button is clicked', async () => {

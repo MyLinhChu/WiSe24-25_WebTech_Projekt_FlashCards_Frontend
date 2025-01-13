@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import FlashCard from '@/components/FlashCard.vue';
+import FlashCard from '../../components/FlashCard.vue';
 
 describe('FlashCard.vue', () => {
   it('displays the question on the front of the card', () => {

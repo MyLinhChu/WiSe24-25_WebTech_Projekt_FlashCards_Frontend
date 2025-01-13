@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import CreateDeckView from '@/views/CreateDeckView.vue';
+import CreateDeckView from '../../views/CreateDeckView.vue';
 
 describe('CreateDeckView.vue', () => {
   it('saves changes when the save button is clicked', async () => {

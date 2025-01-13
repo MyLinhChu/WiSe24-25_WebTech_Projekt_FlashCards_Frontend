@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import LearnView from '@/views/LearnView.vue';
+import LearnView from '../../views/LearnView.vue';
 
 describe('LearnView.vue', () => {
   it('shows correct progress based on answered cards', async () => {

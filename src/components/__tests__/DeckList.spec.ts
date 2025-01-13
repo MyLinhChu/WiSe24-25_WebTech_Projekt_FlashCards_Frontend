@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import DeckList from '@/views/HomeView.vue';
+import DeckList from  '../../views/HomeView.vue';
 
 describe('DeckList.vue', () => {
   it('renders the list of decks', () => {

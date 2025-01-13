@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import CreateDeckView from '@/views/CreateDeckView.vue';
+import CreateDeckView from  '../../views/HomeView.vue';
 
 describe('CreateDeckView.vue', () => {
   it('adds a new card when the add button is clicked', async () => {
