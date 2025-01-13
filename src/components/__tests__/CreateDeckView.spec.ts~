@@ -1,0 +1,60 @@
+import { describe, it, expect } from 'vitest';
+import { mount } from '@vue/test-utils';
+import CreateDeckView from '@/views/CreateDeckView.vue';
+
+describe('CreateDeckView.vue', () => {
+  it('adds a new card when the add button is clicked', async () => {
+    // Mount the component
+    const wrapper = mount(CreateDeckView, {
+      global: {
+        stubs: ['router-link'], // Stub router-link to avoid navigation errors
+      },
+    });
+
+    // Initially, no cards should exist
+    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(0);
+    expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(0);
+
+    // Simulate clicking the "Add Card" button
+    const addButton = wrapper.find('button.mt-4'); // Adjust the selector as needed
+    await addButton.trigger('click');
+
+    // Check if a new card is added to the DOM
+    const questionInputs = wrapper.findAll('input[placeholder="Question"]');
+    const answerInputs = wrapper.findAll('input[placeholder="Answer"]');
+
+    // Verify the new card is displayed in the UI
+    expect(questionInputs.length).toBe(1);
+    expect(answerInputs.length).toBe(1);
+
+    // Verify the inputs are empty
+    expect(questionInputs[0].element.value).toBe('');
+    expect(answerInputs[0].element.value).toBe('');
+  });
+
+  it('removes a card when the delete button is clicked', async () => {
+    // Mount the component with one initial card
+    const wrapper = mount(CreateDeckView, {
+      global: {
+        stubs: ['router-link'],
+      },
+    });
+
+    // Simulate clicking the "Add Card" button twice to add two cards
+    const addButton = wrapper.find('button.mt-4');
+    await addButton.trigger('click');
+    await addButton.trigger('click');
+
+    // Verify there are two cards displayed
+    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(2);
+    expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(2);
+
+    // Simulate clicking the delete button for the first card
+    const deleteButtons = wrapper.findAll('button.text-red-500');
+    await deleteButtons[0].trigger('click');
+
+    // Verify only one card remains in the UI
+    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(1);
+    expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(1);
+  });
+});
