@@ -122,25 +122,19 @@ const remainingCount = computed(() =>
 
 // Methode zur Verarbeitung einer Antwort (richtig oder falsch)
 const handleCardResponse = (correct: boolean) => {
-  // Wenn die Sitzung bereits abgeschlossen ist, keine weiteren Aktionen ausführen
-  if (completed.value) {
-    return;
-  }
-
-  // Zähler für richtige oder falsche Antworten erhöhen
   if (correct) {
-    correctCount.value++; // Richtige Antwort
+    correctCount.value++
   } else {
-    incorrectCount.value++; // Falsche Antwort
+    incorrectCount.value++
   }
 
-  // Zur nächsten Karte wechseln oder die Sitzung abschließen
+  // Nächste Karte oder Session abschließen
   if (currentIndex.value < cards.value.length - 1) {
-    currentIndex.value++; // Index zur nächsten Karte erhöhen
+    currentIndex.value++
   } else {
-    completed.value = true; // Sitzung als abgeschlossen markieren
+    completed.value = true
   }
-};
+}
 
 // Session neu starten
 const restartSession = () => {
