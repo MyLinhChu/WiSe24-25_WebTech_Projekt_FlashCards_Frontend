@@ -4,8 +4,10 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestingPinia } from '@pinia/testing';
 import CreateDeckView from '../../views/CreateDeckView.vue';
 
-describe('AddCards.vue', () => {
-  it('adds a new card when the "Add Card" button is clicked', async () => {
+describe('SaveDeck.vue', () => {
+  it('calls saveDeck when the save button is clicked', async () => {
+    const mockSaveDeck = vi.fn();
+
     const router = createRouter({
       history: createMemoryHistory(),
       routes: [{ path: '/', name: 'home', component: CreateDeckView }],
@@ -22,21 +24,19 @@ describe('AddCards.vue', () => {
                 decks: [],
               },
             },
+            actions: {
+              saveDeck: mockSaveDeck,
+            },
           }),
         ],
         stubs: ['router-link'],
       },
     });
 
-    // Überprüfen, ob beim Laden eine Standardkarte vorhanden ist
-    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(1);
+    const saveButton = wrapper.find('button[type="submit"]');
+    expect(saveButton.exists()).toBe(true);
 
-    // Button "Add Card" klicken
-    const addButton = wrapper.find('button[type="button"]');
-    await addButton.trigger('click');
-
-    // Prüfen, ob eine zweite Karte hinzugefügt wurde
-    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(2);
-    expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(2);
+    await saveButton.trigger('click');
+    expect(mockSaveDeck).toHaveBeenCalled(); // Prüfen, ob `saveDeck` aufgerufen wurde
   });
 });

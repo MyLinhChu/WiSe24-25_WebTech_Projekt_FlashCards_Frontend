@@ -14,8 +14,13 @@ describe('DeleteDeck.vue', () => {
             createSpy: vi.fn,
             initialState: {
               deck: {
-                decks: [{ id: 1, name: 'Math Deck', description: '', cards: [] }],
+                decks: [
+                  { id: 1, name: 'Math Deck', description: '', cards: [] },
+                ],
               },
+            },
+            actions: {
+              deleteDeck: mockDeleteDeck,
             },
           }),
         ],
@@ -27,6 +32,6 @@ describe('DeleteDeck.vue', () => {
     expect(deleteButton.exists()).toBe(true);
 
     await deleteButton.trigger('click');
-    expect(mockDeleteDeck).toHaveBeenCalled(); // Prüfen, ob deleteDeck aufgerufen wurde
+    expect(mockDeleteDeck).toHaveBeenCalledWith(1); // Deck-ID überprüfen
   });
 });

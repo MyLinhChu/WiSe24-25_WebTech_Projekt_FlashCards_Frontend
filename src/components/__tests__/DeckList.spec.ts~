@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import DeckList from '../../views/HomeView.vue';
-//funktioniert
+
 describe('DeckList.vue', () => {
   it('renders the list of decks', () => {
     const decks = [

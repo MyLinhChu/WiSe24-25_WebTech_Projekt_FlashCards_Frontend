@@ -13,30 +13,21 @@ describe('AddCards.vue', () => {
 
     const wrapper = mount(CreateDeckView, {
       global: {
-        plugins: [
-          router,
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              deck: {
-                decks: [],
-              },
-            },
-          }),
-        ],
+        plugins: [router, createTestingPinia({ createSpy: vi.fn })],
         stubs: ['router-link'],
       },
     });
 
-    // Überprüfen, ob beim Laden eine Standardkarte vorhanden ist
+    // Überprüfen, ob eine Standardkarte beim Laden vorhanden ist
     expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(1);
 
-    // Button "Add Card" klicken
+    // Klicken Sie auf die Schaltfläche zum Hinzufügen einer Karte
     const addButton = wrapper.find('button[type="button"]');
     await addButton.trigger('click');
 
-    // Prüfen, ob eine zweite Karte hinzugefügt wurde
+    // Überprüfen, ob jetzt zwei Karten vorhanden sind
     expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(2);
     expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(2);
   });
-});
+})
+
