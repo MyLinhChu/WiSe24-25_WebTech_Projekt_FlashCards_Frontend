@@ -1,0 +1,38 @@
+import { mount } from '@vue/test-utils';
+import { createMockRouter } from '@/test-utils/router';
+import { createMockPinia } from '@/test-utils/pinia';
+import UpdateDeck from '@/components/UpdateDeck.vue';
+
+describe('UpdateDeck.vue', () => {
+  it('updates the deck when the save button is clicked', async () => {
+    const router = createMockRouter();
+    const pinia = createMockPinia({
+      deck: {
+        decks: [
+          { id: 1, name: 'Old Deck', description: 'Old Description', cards: [] },
+        ],
+      },
+    });
+
+    const wrapper = mount(UpdateDeck, {
+      global: {
+        plugins: [router, pinia],
+      },
+    });
+
+    await router.push('/deck/1');
+    await router.isReady();
+
+    // Simulate form inputs
+    const nameInput = wrapper.find('[data-test="deck-name-input"]');
+    await nameInput.setValue('Updated Deck');
+
+    const saveButton = wrapper.find('[data-test="save-button"]');
+    await saveButton.trigger('click');
+
+    // Expect the updated deck to be saved
+    expect(wrapper.vm.$store.updateDeck).toHaveBeenCalledWith(1, {
+      name: 'Updated Deck',
+    });
+  });
+});

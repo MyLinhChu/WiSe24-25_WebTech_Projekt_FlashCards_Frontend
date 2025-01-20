@@ -1,42 +1,48 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
+import HomeView from '../../views/HomeView.vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestingPinia } from '@pinia/testing';
 import CreateDeckView from '../../views/CreateDeckView.vue';
 
-describe('SaveDeck.vue', () => {
-  it('calls saveDeck when the save button is clicked', async () => {
-    const mockSaveDeck = vi.fn();
-
+describe('AddCards.vue', () => {
+  it('adds a new card to the deck', async () => {
     const router = createRouter({
       history: createMemoryHistory(),
-      routes: [{ path: '/', name: 'home', component: CreateDeckView }],
+      routes: [
+        { path: '/', name: 'home', component: HomeView },
+        { path: '/edit/:id', name: 'edit', component: CreateDeckView },
+      ],
     });
 
-    const wrapper = mount(CreateDeckView, {
-      global: {
-        plugins: [
-          router,
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              deck: {
-                decks: [],
-              },
-            },
-            actions: {
-              saveDeck: mockSaveDeck,
-            },
-          }),
-        ],
-        stubs: ['router-link'],
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        deck: {
+          decks: [{ id: 1, name: 'Sample Deck', description: '', cards: [] }],
+        },
       },
     });
 
-    const saveButton = wrapper.find('button[type="submit"]');
-    expect(saveButton.exists()).toBe(true);
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [pinia, router],
+      },
+    });
 
-    await saveButton.trigger('click');
-    expect(mockSaveDeck).toHaveBeenCalled(); // Prüfen, ob `saveDeck` aufgerufen wurde
+    // Navigate to the edit view
+    const editLink = wrapper.find('a[href="/edit/1"]');
+    expect(editLink.exists()).toBe(true);
+    await editLink.trigger('click');
+
+    await router.isReady();
+
+    // Add a card in the edit view
+    const createDeckView = wrapper.findComponent(CreateDeckView);
+    const addCardButton = createDeckView.find('button:text("Add Card")');
+    await addCardButton.trigger('click');
+
+    const cardInputs = createDeckView.findAll('input[placeholder="Question"]');
+    expect(cardInputs.length).toBe(1); // Verify a new card was added
   });
 });

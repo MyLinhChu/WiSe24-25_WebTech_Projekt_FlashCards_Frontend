@@ -1,10 +1,10 @@
-import { createRouter, createMemoryHistory } from 'vue-router' // Router-Funktionen von Vue
+import { createRouter, createWebHistory } from 'vue-router' // Router-Funktionen von Vue
 import HomeView from '../views/HomeView.vue' // Hauptseite (Liste der Decks)
 import CreateDeckView from '../views/CreateDeckView.vue' // Seite zum Erstellen/Bearbeiten von Decks
 import LearnView from '../views/LearnView.vue' // Seite für den Lernmodus
 
 const router = createRouter({
-  history: createMemoryHistory(),  // Verwendet die Browser-Historie für Navigation (ohne Hash in URLs)
+  history: createWebHistory(),  // Verwendet die Browser-Historie für Navigation (ohne Hash in URLs)
   routes: [
     {
       path: '/', // Startseite

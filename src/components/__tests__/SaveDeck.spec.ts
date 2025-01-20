@@ -1,40 +1,47 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createRouter, createMemoryHistory } from 'vue-router';
-import { createTestingPinia } from '@pinia/testing';
+import HomeView from '../../views/HomeView.vue';
 import CreateDeckView from '../../views/CreateDeckView.vue';
+import { createTestingPinia } from '@pinia/testing';
+import { createRouter, createMemoryHistory } from 'vue-router';
+import { useDeckStore } from '@/stores/decks';
 
 describe('SaveDeck.vue', () => {
-  it('calls saveDeck when the save button is clicked', async () => {
-    const mockSaveDeck = vi.fn();
-
+  it('saves a new deck correctly', async () => {
     const router = createRouter({
       history: createMemoryHistory(),
-      routes: [{ path: '/', name: 'home', component: CreateDeckView }],
+      routes: [
+        { path: '/', name: 'home', component: HomeView },
+        { path: '/create', name: 'create', component: CreateDeckView },
+      ],
     });
 
-    const wrapper = mount(CreateDeckView, {
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: { deck: { decks: [] } },
+    });
+
+    const wrapper = mount(HomeView, {
       global: {
-        plugins: [
-          router,
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              deck: { decks: [] },
-            },
-          }),
-        ],
-        stubs: ['router-link'],
-        mocks: {
-          $store: { saveDeck: mockSaveDeck },
-        },
+        plugins: [pinia, router],
       },
     });
 
-    const saveButton = wrapper.find('button[type="submit"]');
-    expect(saveButton.exists()).toBe(true);
+    const deckStore = useDeckStore();
+    const saveSpy = vi.spyOn(deckStore, 'createDeck');
 
-    await saveButton.trigger('click');
-    expect(mockSaveDeck).toHaveBeenCalled(); // Prüfen, ob `saveDeck` aufgerufen wurde
+    // Navigate to create deck view
+    const createLink = wrapper.find('a[href="/create"]');
+    await createLink.trigger('click');
+
+    await router.isReady();
+
+    // Fill in the form in CreateDeckView
+    const createView = wrapper.findComponent(CreateDeckView);
+    await createView.find('input#deckName').setValue('New Deck');
+    await createView.find('textarea#deckDescription').setValue('Deck Description');
+    await createView.find('button[type="submit"]').trigger('click');
+
+    expect(saveSpy).toHaveBeenCalledWith('New Deck', 'Deck Description', []);
   });
 });

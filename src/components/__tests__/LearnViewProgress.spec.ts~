@@ -1,0 +1,53 @@
+import { describe, it, expect, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
+import HomeView from '../../views/HomeView.vue';
+import { createTestingPinia } from '@pinia/testing';
+import { createRouter, createMemoryHistory } from 'vue-router';
+
+describe('LearnViewProgress.vue', () => {
+  it('displays progress correctly in LearnView', async () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/', name: 'home', component: HomeView },
+        { path: '/learn/:id', name: 'learn', component: LearnView },
+      ],
+    });
+
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        deck: {
+          decks: [
+            {
+              id: 1,
+              name: 'Sample Deck',
+              cards: [
+                { id: 1, frage: 'Question 1', antwort: 'Answer 1' },
+                { id: 2, frage: 'Question 2', antwort: 'Answer 2' },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [pinia, router],
+        stubs: ['router-link'],
+      },
+    });
+
+    // Navigate to LearnView
+    const learnButton = wrapper.find('a[href="/learn/1"]');
+    await learnButton.trigger('click');
+    await router.isReady();
+
+    const learnView = wrapper.findComponent(LearnView);
+
+    // Verify progress
+    expect(learnView.text()).toContain('Card 1 of 2');
+    expect(learnView.text()).toContain('Remaining: 2');
+  });
+});

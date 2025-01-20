@@ -1,37 +1,52 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+import HomeView from '../../views/HomeView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import DeckList from '../../views/HomeView.vue';
+import { createRouter, createMemoryHistory } from 'vue-router';
 
 describe('DeleteDeck.vue', () => {
-  it('calls deleteDeck when the delete button is clicked', async () => {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/', name: 'home', component: HomeView },
+    ],
+  });
+
+  it('deletes a deck when the delete button is clicked', async () => {
     const mockDeleteDeck = vi.fn();
 
-    const wrapper = mount(DeckList, {
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        deck: {
+          decks: [
+            { id: 1, name: 'Sample Deck', description: 'Test Description', cards: [] },
+          ],
+        },
+      },
+    });
+
+    const wrapper = mount(HomeView, {
       global: {
-        plugins: [
-          createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-              deck: {
-                decks: [
-                  { id: 1, name: 'Math Deck', description: '', cards: [] },
-                ],
-              },
-            },
-            actions: {
-              deleteDeck: mockDeleteDeck,
-            },
-          }),
-        ],
+        plugins: [pinia, router],
         stubs: ['router-link'],
       },
     });
 
-    const deleteButton = wrapper.find('button.text-red-500');
+    const deckStore = wrapper.vm.$pinia.getStore('deck'); // Access the store
+    deckStore.deleteDeck = mockDeleteDeck; // Mock deleteDeck
+
+    // Trigger delete action
+    const deleteButton = wrapper.find('button[text-gray-500]'); // Adjust selector to your actual button
     expect(deleteButton.exists()).toBe(true);
 
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
     await deleteButton.trigger('click');
-    expect(mockDeleteDeck).toHaveBeenCalledWith(1); // Deck-ID überprüfen
+
+    // Check that deleteDeck was called
+    expect(mockDeleteDeck).toHaveBeenCalledWith(1);
+
+    vi.restoreAllMocks();
   });
 });
+

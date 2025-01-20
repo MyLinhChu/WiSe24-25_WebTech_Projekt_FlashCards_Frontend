@@ -1,33 +1,50 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, vi, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
+import HomeView from '../../views/HomeView.vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestingPinia } from '@pinia/testing';
 import CreateDeckView from '../../views/CreateDeckView.vue';
 
 describe('AddCards.vue', () => {
-  it('adds a new card when the "Add Card" button is clicked', async () => {
+  it('adds a new card to the deck', async () => {
     const router = createRouter({
       history: createMemoryHistory(),
-      routes: [{ path: '/', name: 'home', component: CreateDeckView }],
+      routes: [
+        { path: '/', name: 'home', component: HomeView },
+        { path: '/edit/:id', name: 'edit', component: CreateDeckView },
+      ],
     });
 
-    const wrapper = mount(CreateDeckView, {
-      global: {
-        plugins: [router, createTestingPinia({ createSpy: vi.fn })],
-        stubs: ['router-link'],
+    const pinia = createTestingPinia({
+      createSpy: vi.fn,
+      initialState: {
+        deck: {
+          decks: [{ id: 1, name: 'Sample Deck', description: '', cards: [] }],
+        },
       },
     });
 
-    // Überprüfen, ob eine Standardkarte beim Laden vorhanden ist
-    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(1);
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [pinia, router],
+      },
+    });
 
-    // Klicken Sie auf die Schaltfläche zum Hinzufügen einer Karte
-    const addButton = wrapper.find('button[type="button"]');
-    await addButton.trigger('click');
+    // Navigate programmatically to the edit route
+    router.push('/edit/1');
+    await router.isReady();
 
-    // Überprüfen, ob jetzt zwei Karten vorhanden sind
-    expect(wrapper.findAll('input[placeholder="Question"]').length).toBe(2);
-    expect(wrapper.findAll('input[placeholder="Answer"]').length).toBe(2);
+    // Verify that the correct component is rendered for the route
+    const createDeckView = wrapper.findComponent(CreateDeckView);
+    expect(createDeckView.exists()).toBe(true);
+
+    // Interact with the Add Card button in the CreateDeckView
+    const addCardButton = createDeckView.find('button:has-text("Add Card")');
+    expect(addCardButton.exists()).toBe(true); // Ensure button exists
+    await addCardButton.trigger('click');
+
+    // Check if a new card input was added
+    const cardInputs = createDeckView.findAll('input[placeholder="Question"]');
+    expect(cardInputs.length).toBe(1); // One card input should now exist
   });
-})
-
+});
