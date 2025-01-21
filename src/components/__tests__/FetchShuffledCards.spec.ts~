@@ -1,0 +1,51 @@
+import { describe, it, expect, vi } from 'vitest';
+import { createTestingPinia } from '@pinia/testing';
+import { useDeckStore } from '@/stores/decks';
+import axios from 'axios';
+
+vi.mock('axios'); // Mock axios for controlled responses
+
+describe('DeckStore - fetchShuffledCards', () => {
+  it('fetches and shuffles cards correctly', async () => {
+    // Arrange: Mock data from the API
+    const mockCards = [
+      { frage: 'Question 1', antwort: 'Answer 1' },
+      { frage: 'Question 2', antwort: 'Answer 2' },
+      { frage: 'Question 3', antwort: 'Answer 3' },
+    ];
+
+    // Mock API response
+    vi.spyOn(axios, 'get').mockResolvedValueOnce({
+      data: mockCards,
+      headers: { 'content-type': 'application/json' },
+    });
+
+    const deckStore = useDeckStore(createTestingPinia({ createSpy: vi.fn }));
+
+    // Act: Call fetchShuffledCards
+    const result = await deckStore.fetchShuffledCards(1);
+
+    // Assert: Verify that cards are shuffled
+    expect(result).toHaveLength(mockCards.length);
+    expect(result).not.toEqual(mockCards); // Order should differ
+    expect(result.map(card => card.frage).sort()).toEqual(
+      mockCards.map(card => card.frage).sort()
+    ); // Ensure the same cards are present
+  });
+
+  it('throws an error if the response is invalid', async () => {
+    // Mock an invalid response
+    vi.spyOn(axios, 'get').mockResolvedValueOnce({
+      data: '<!DOCTYPE html>', // Simulate invalid HTML response
+      headers: { 'content-type': 'text/html' },
+    });
+
+    const deckStore = useDeckStore(createTestingPinia({ createSpy: vi.fn }));
+
+    // Act & Assert: Expect the method to throw an error
+    await expect(deckStore.fetchShuffledCards(1)).rejects.toThrow(
+      'Failed to fetch shuffled cards'
+    );
+  });
+});
+

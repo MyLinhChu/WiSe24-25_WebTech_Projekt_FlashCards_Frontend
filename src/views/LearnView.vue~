@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'; // Router for navigation
 import { useDeckStore } from '@/stores/decks'; // Import Pinia store
 import FlashCard from '@/components/FlashCard.vue'; // FlashCard component
 import type { FlashCard as FlashCardType } from '@/types'; // FlashCard type
+import { ArrowLeftIcon } from 'lucide-vue-next' // Icons
 
 const deckStore = useDeckStore(); // Use Pinia store
 const route = useRoute();
@@ -43,21 +44,42 @@ const fetchShuffledCards = async () => {
 
 
 // Handle response for the current card
-const handleCardResponse = (correct: boolean) => {
+const handleCardResponse = async (correct: boolean) => {
+  // Prevent further actions if session is completed
   if (completed.value) return;
 
+  // Disable button actions temporarily to avoid rapid clicks
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => button.setAttribute('disabled', 'true'));
+
+  // Count the response
   if (correct) {
     correctCount.value++;
   } else {
     incorrectCount.value++;
   }
 
+  // Flip back the current card
+  const flashCardElement = document.querySelector('.card-container');
+  if (flashCardElement) {
+    flashCardElement.classList.remove('is-flipped');
+  }
+
+  // Wait a moment before showing the next card
+  await new Promise(resolve => setTimeout(resolve, 500)); // Adjust delay as needed
+
+  // Move to the next card or mark session as completed
   if (currentIndex.value < cards.value.length - 1) {
     currentIndex.value++;
   } else {
     completed.value = true;
   }
+
+  // Re-enable buttons after transition
+  buttons.forEach(button => button.removeAttribute('disabled'));
 };
+
+
 
 // Restart the session and fetch new shuffled cards
 const restartSession = async () => {
